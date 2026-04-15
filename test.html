@@ -114,7 +114,7 @@ async function setup() {
   try {
     // Register Service Worker
     log('Registering Service Worker...', 'info');
-    swReg = await navigator.serviceWorker.register('/sw.js');
+    swReg = await navigator.serviceWorker.register('./sw.js');
     log('Service Worker registered ✓', 'ok');
 
     // Wait for it to be active
