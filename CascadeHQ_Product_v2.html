@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CascadeHQ — Hybrid Voice Conferencing Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Outfit',system-ui,sans-serif;background:#0B0F1A;color:#F1F5F9;overflow:hidden;height:100vh}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:#111827}
+::-webkit-scrollbar-thumb{background:#1E293B;border-radius:4px}
+button{font-family:'Outfit',sans-serif;cursor:pointer;border:none}
+input,select,textarea{font-family:'Outfit',sans-serif;outline:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes barAnim1{0%{height:8px}100%{height:26px}}
+@keyframes barAnim2{0%{height:14px}100%{height:32px}}
+@keyframes barAnim3{0%{height:6px}100%{height:20px}}
+.fade{animation:fadeIn .4s ease}
+
+.app{display:flex;height:100vh}
+.sidebar{width:210px;background:#111827;border-right:1px solid #1E293B;display:flex;flex-direction:column;flex-shrink:0}
+.sidebar-logo{padding:16px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #1E293B}
+.sidebar-logo-icon{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#3B82F6,#6366F1);display:flex;align-items:center;justify-content:center}
+.sidebar-logo span{font-size:15px;font-weight:700}
+.sidebar nav{flex:1;padding:8px 6px;overflow-y:auto}
+.nav-btn{width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;background:transparent;color:#94A3B8;font-size:12px;font-weight:500;margin-bottom:2px;transition:all .15s}
+.nav-btn:hover{background:#1A223540}
+.nav-btn.active{background:#3B82F615;color:#3B82F6}
+.nav-btn svg{flex-shrink:0}
+.sidebar-user{padding:12px 14px;border-top:1px solid #1E293B;display:flex;align-items:center;gap:8px}
+.avatar-sm{width:28px;height:28px;border-radius:14px;background:#6366F1;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff}
+.main{flex:1;overflow-y:auto;padding:24px}
+
+.stat-grid{display:grid;gap:12px;margin-bottom:20px}
+.stat-grid-4{grid-template-columns:repeat(4,1fr)}
+.stat-grid-3{grid-template-columns:repeat(3,1fr)}
+.stat-grid-2{grid-template-columns:repeat(2,1fr)}
+.stat{background:#111827;border-radius:14px;padding:16px 18px;border:1px solid #1E293B}
+.stat-label{font-size:11px;color:#64748B;margin-bottom:6px;font-weight:500;letter-spacing:.4px}
+.stat-value{font-size:26px;font-weight:700;letter-spacing:-.5px}
+.stat-sub{font-size:11px;color:#64748B;margin-top:4px}
+
+.card{background:#111827;border-radius:14px;padding:16px;border:1px solid #1E293B;margin-bottom:12px}
+.card-title{font-size:13px;font-weight:600;margin-bottom:12px}
+
+.badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;letter-spacing:.3px;display:inline-block;white-space:nowrap}
+
+.btn{padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px;transition:all .2s}
+.btn-primary{background:linear-gradient(135deg,#3B82F6,#6366F1);color:#fff}
+.btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn-danger{background:#EF4444;color:#fff}
+.btn-sm{padding:6px 12px;font-size:11px}
+.btn-ghost{background:#1A2235;color:#94A3B8}
+.btn-ghost:hover{background:#1E293B}
+
+.input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #1E293B;background:#0B0F1A;color:#F1F5F9;font-size:13px}
+.input-label{font-size:11px;font-weight:500;color:#94A3B8;display:block;margin-bottom:5px;letter-spacing:.3px}
+.input-group{margin-bottom:14px}
+
+.table{width:100%;border-collapse:collapse}
+.table th{padding:10px 14px;text-align:left;font-size:10px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #1E293B}
+.table td{padding:10px 14px;border-bottom:1px solid #1E293B08;font-size:12px}
+
+.meeting-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #1E293B;cursor:pointer;transition:background .15s;border-radius:8px;padding:10px 8px;margin:0 -8px}
+.meeting-row:hover{background:#1A223530}
+.meeting-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+
+.mic-btn{width:72px;height:72px;border-radius:36px;display:inline-flex;align-items:center;justify-content:center;transition:all .3s}
+.mic-btn:hover{transform:scale(1.05)}
+
+.progress-bar{height:8px;border-radius:4px;background:#1E293B;overflow:hidden}
+.progress-fill{height:100%;border-radius:4px;transition:width .5s ease}
+
+.chip{padding:7px 14px;border-radius:20px;font-size:11px;font-weight:500;transition:all .2s;background:transparent}
+.chip:hover{filter:brightness(1.1)}
+
+.participant{display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;background:#1A2235}
+.participant-icon{width:28px;height:28px;border-radius:14px;display:flex;align-items:center;justify-content:center}
+
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:#0B0F1A}
+.login-box{width:100%;max-width:380px}
+.login-card{background:#111827;border-radius:16px;padding:24px;border:1px solid #1E293B}
+
+.join-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:#0B0F1A}
+.join-box{width:100%;max-width:360px;text-align:center}
+.audio-bars{display:flex;gap:10px;justify-content:center;height:32px;align-items:flex-end}
+.audio-bar{width:4px;border-radius:2px}
+
+.hidden{display:none}
+
+@media(max-width:768px){
+  .sidebar{width:60px}
+  .sidebar-logo span,.nav-btn span,.sidebar-user>div:last-child{display:none}
+  .nav-btn{justify-content:center;padding:10px}
+  .stat-grid-4{grid-template-columns:repeat(2,1fr)}
+  .stat-grid-3{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<div id="login-page" class="login-wrap">
+  <div class="login-box fade">
+    <div style="text-align:center;margin-bottom:32px">
+      <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#3B82F6,#6366F1);display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+      </div>
+      <h1 style="font-size:24px;font-weight:700">CascadeHQ</h1>
+      <p style="font-size:13px;color:#64748B;margin-top:6px">Hybrid voice conferencing platform</p>
+    </div>
+    <div class="login-card">
+      <div class="input-group"><label class="input-label">Email</label><input class="input" placeholder="admin@company.com"></div>
+      <div class="input-group"><label class="input-label">Password</label><input class="input" type="password" placeholder="Enter password"></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:6px" onclick="showApp()">Sign in to dashboard</button>
+      <p style="font-size:11px;color:#64748B;text-align:center;margin-top:14px">Demo mode — click sign in with any credentials</p>
+    </div>
+  </div>
+</div>
+
+<div id="app" class="app hidden">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+      <span>CascadeHQ</span>
+    </div>
+    <nav id="nav"></nav>
+    <div class="sidebar-user">
+      <div class="avatar-sm">A</div>
+      <div><div style="font-size:11px;font-weight:600">Admin</div><div style="font-size:9px;color:#64748B">MedPharma India</div></div>
+    </div>
+  </aside>
+  <main class="main" id="main-content"></main>
+</div>
+
+<script>
+const C={accent:"#3B82F6",accent2:"#6366F1",green:"#10B981",red:"#EF4444",amber:"#F59E0B"};
+
+const contacts=[
+{id:1,name:"Ravi Teja",phone:"+91 98765 43210",group:"South Zone",ch:"webrtc",on:true},
+{id:2,name:"Meena Kumari",phone:"+91 87654 32109",group:"South Zone",ch:"pstn",on:false},
+{id:3,name:"Vikram Singh",phone:"+91 76543 21098",group:"North Zone",ch:"webrtc",on:true},
+{id:4,name:"Neha Gupta",phone:"+91 65432 10987",group:"North Zone",ch:"webrtc",on:true},
+{id:5,name:"Arun Shetty",phone:"+91 54321 09876",group:"South Zone",ch:"webrtc",on:true},
+{id:6,name:"Pooja Sharma",phone:"+91 43210 98765",group:"North Zone",ch:"pstn",on:false},
+{id:7,name:"Kiran Rao",phone:"+91 32109 87654",group:"South Zone",ch:"webrtc",on:true},
+{id:8,name:"Lakshmi N",phone:"+91 21098 76543",group:"South Zone",ch:"pstn",on:false},
+{id:9,name:"Arjun Malik",phone:"+91 10987 65432",group:"North Zone",ch:"webrtc",on:true},
+{id:10,name:"Sneha Kapoor",phone:"+91 99887 76655",group:"North Zone",ch:"pstn",on:false}
+];
+
+const pages=[
+{id:"dash",label:"Dashboard",icon:'<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/>'},
+{id:"contacts",label:"Contacts",icon:'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>'},
+{id:"new",label:"New meeting",icon:'<path d="M12 5v14M5 12h14"/>'},
+{id:"live",label:"Live room",icon:'<path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/>'},
+{id:"analytics",label:"Analytics",icon:'<path d="M18 20V10M12 20V4M6 20v-6"/>'},
+{id:"join",label:"Join page",icon:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>'}
+];
+
+let currentPage="dash";
+let liveTimer=null;
+let liveData={elapsed:0,wj:12,pj:3,ring:47,muted:false,ended:false};
+
+function badge(text,color){return `<span class="badge" style="background:${color}20;color:${color}">${text}</span>`}
+function stat(label,value,sub,color=C.accent){return `<div class="stat"><div class="stat-label">${label}</div><div class="stat-value" style="color:${color}">${value}</div>${sub?`<div class="stat-sub">${sub}</div>`:""}</div>`}
+
+function showApp(){
+  document.getElementById("login-page").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+  buildNav();
+  navigate("dash");
+}
+
+function buildNav(){
+  const nav=document.getElementById("nav");
+  nav.innerHTML=pages.map(p=>`<button class="nav-btn${p.id===currentPage?" active":""}" onclick="navigate('${p.id}')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${p.icon}</svg><span>${p.label}</span></button>`).join("");
+}
+
+function navigate(id){
+  if(liveTimer){clearInterval(liveTimer);liveTimer=null}
+  currentPage=id;
+  buildNav();
+  const m=document.getElementById("main-content");
+  if(id==="dash")m.innerHTML=renderDashboard();
+  else if(id==="contacts")m.innerHTML=renderContacts();
+  else if(id==="new")m.innerHTML=renderNewMeeting();
+  else if(id==="live"){liveData={elapsed:0,wj:12,pj:3,ring:47,muted:false,ended:false};m.innerHTML=renderLive();startLiveTimer()}
+  else if(id==="analytics")m.innerHTML=renderAnalytics();
+  else if(id==="join")m.innerHTML=renderJoin();
+}
+
+function renderDashboard(){
+  return `<div class="fade">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <div><h2 style="font-size:20px;font-weight:700">Dashboard</h2><p style="font-size:12px;color:#64748B;margin-top:2px">Welcome back, Admin</p></div>
+    <button class="btn btn-primary" onclick="navigate('new')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> New meeting</button>
+  </div>
+  <div class="stat-grid stat-grid-4">
+    ${stat("Total contacts","500","47 groups")}
+    ${stat("Meetings this month","12","3 scheduled",C.accent2)}
+    ${stat("Cost saved vs SpearUC","Rs 38K","This month",C.green)}
+    ${stat("Avg join rate","93%","+4% from last month",C.green)}
+  </div>
+  <div class="card">
+    <div class="card-title">Recent meetings</div>
+    <div class="meeting-row" onclick="navigate('analytics')">
+      <div class="meeting-icon" style="background:${C.green}20"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${C.green}" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:500">CardioShield 500mg launch briefing</div><div style="font-size:11px;color:#64748B;margin-top:2px">Apr 13, 2026 · 18 min · 187/200 joined</div></div>
+      ${badge("completed",C.green)}<div style="font-size:11px;color:#64748B;margin-left:8px">Rs 1,250</div>
+    </div>
+    <div class="meeting-row" onclick="navigate('analytics')">
+      <div class="meeting-icon" style="background:${C.green}20"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${C.green}" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:500">North zone pricing strategy</div><div style="font-size:11px;color:#64748B;margin-top:2px">Apr 11, 2026 · 12 min · 45/50 joined</div></div>
+      ${badge("completed",C.green)}<div style="font-size:11px;color:#64748B;margin-left:8px">Rs 360</div>
+    </div>
+    <div class="meeting-row">
+      <div class="meeting-icon" style="background:${C.accent}20"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${C.accent}" stroke-width="2"><path d="M5 3l14 9-14 9V3z"/></svg></div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:500">Weekly field feedback roundup</div><div style="font-size:11px;color:#64748B;margin-top:2px">Apr 15, 2026 · Scheduled</div></div>
+      ${badge("scheduled",C.accent)}
+    </div>
+  </div>
+  </div>`;
+}
+
+function renderContacts(){
+  const wc=contacts.filter(c=>c.ch==="webrtc").length;
+  const pc=contacts.length-wc;
+  return `<div class="fade">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <h2 style="font-size:20px;font-weight:700">Contacts</h2>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost btn-sm"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg> CSV upload</button>
+      <button class="btn btn-primary btn-sm" onclick="toggleAddContact()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> Add contact</button>
+    </div>
+  </div>
+  <div class="stat-grid stat-grid-3">
+    ${stat("Total contacts",contacts.length,"")}
+    ${stat("Smartphone (WebRTC)",wc,Math.round(wc/contacts.length*100)+"% — free calls",C.green)}
+    ${stat("Basic phone (PSTN)",pc,Math.round(pc/contacts.length*100)+"% — paid calls",C.amber)}
+  </div>
+  <div id="add-form" class="hidden" style="background:#111827;border-radius:14px;padding:16px;border:1px solid ${C.accent}40;margin-bottom:16px">
+    <div style="font-size:13px;font-weight:600;margin-bottom:12px">Add new contact</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="input-group"><label class="input-label">Name</label><input id="new-name" class="input" placeholder="Ravi Teja"></div>
+      <div class="input-group"><label class="input-label">Phone</label><input id="new-phone" class="input" placeholder="+91 98765 43210"></div>
+    </div>
+    <div class="input-group"><label class="input-label">Phone type</label>
+      <div style="display:flex;gap:6px">
+        <button id="ch-webrtc" class="chip" style="flex:1;border:1px solid ${C.green};background:${C.green}15;color:${C.green}" onclick="setChannel('webrtc')">Smartphone</button>
+        <button id="ch-pstn" class="chip" style="flex:1;border:1px solid #1E293B;color:#94A3B8" onclick="setChannel('pstn')">Basic phone</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm" onclick="addContact()">Save contact</button><button class="btn btn-ghost btn-sm" onclick="toggleAddContact()">Cancel</button></div>
+  </div>
+  <input class="input" placeholder="Search by name or phone..." oninput="filterContacts(this.value)" style="margin-bottom:12px">
+  <div class="card" style="overflow:hidden;padding:0">
+    <table class="table"><thead><tr><th>Name</th><th>Phone</th><th>Group</th><th>Channel</th><th>Status</th></tr></thead>
+    <tbody id="contact-tbody">
+    ${contacts.map(c=>`<tr><td style="font-weight:500;color:#F1F5F9">${c.name}</td><td style="font-family:monospace;color:#94A3B8">${c.phone}</td><td>${badge(c.group,C.accent2)}</td><td>${badge(c.ch==="webrtc"?"Smartphone":"Basic phone",c.ch==="webrtc"?C.green:C.amber)}</td><td><span style="display:inline-block;width:6px;height:6px;border-radius:3px;background:${c.on?C.green:"#64748B"};margin-right:6px"></span><span style="font-size:11px;color:#64748B">${c.on?"online":"offline"}</span></td></tr>`).join("")}
+    </tbody></table>
+  </div></div>`;
+}
+
+let newChannel="webrtc";
+function setChannel(ch){
+  newChannel=ch;
+  document.getElementById("ch-webrtc").style.cssText=`flex:1;border:1px solid ${ch==="webrtc"?C.green:"#1E293B"};background:${ch==="webrtc"?C.green+"15":"transparent"};color:${ch==="webrtc"?C.green:"#94A3B8"}`;
+  document.getElementById("ch-pstn").style.cssText=`flex:1;border:1px solid ${ch==="pstn"?C.amber:"#1E293B"};background:${ch==="pstn"?C.amber+"15":"transparent"};color:${ch==="pstn"?C.amber:"#94A3B8"}`;
+}
+function toggleAddContact(){document.getElementById("add-form").classList.toggle("hidden")}
+function addContact(){
+  const n=document.getElementById("new-name").value;
+  const p=document.getElementById("new-phone").value;
+  if(n&&p){contacts.push({id:Date.now(),name:n,phone:p,group:"South Zone",ch:newChannel,on:false});navigate("contacts")}
+}
+function filterContacts(q){
+  const rows=document.getElementById("contact-tbody").querySelectorAll("tr");
+  rows.forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q.toLowerCase())?"":"none"});
+}
+
+function renderNewMeeting(){
+  return `<div class="fade" style="max-width:520px">
+  <h2 style="font-size:20px;font-weight:700;margin-bottom:4px">Create meeting</h2>
+  <p style="font-size:12px;color:#64748B;margin-bottom:20px">Set up a live hybrid meeting</p>
+  <div class="card" style="padding:20px">
+    <div class="input-group"><label class="input-label">Meeting title</label><input class="input" placeholder="CardioShield Q2 launch briefing"></div>
+    <div class="input-group"><label class="input-label">Meeting type</label>
+      <div style="display:flex;gap:8px">
+        <button id="mt-broadcast" class="chip" style="flex:1;padding:12px;border-radius:10px;border:1px solid ${C.accent};background:${C.accent}12;text-align:left" onclick="setMeetingType('broadcast')"><div style="font-size:12px;font-weight:600;color:${C.accent}">Broadcast</div><div style="font-size:10px;color:#64748B;margin-top:2px">Admin speaks, others listen</div></button>
+        <button id="mt-conference" class="chip" style="flex:1;padding:12px;border-radius:10px;border:1px solid #1E293B;text-align:left" onclick="setMeetingType('conference')"><div style="font-size:12px;font-weight:600;color:#94A3B8">Conference</div><div style="font-size:10px;color:#64748B;margin-top:2px">Everyone can speak</div></button>
+      </div>
+    </div>
+    <div class="input-group"><label class="input-label">Select groups</label>
+      <div id="group-chips" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+    </div>
+    <div style="background:#0B0F1A;border-radius:10px;padding:12px;margin-bottom:16px">
+      <div style="font-size:11px;color:#64748B;margin-bottom:6px">Estimated for this meeting</div>
+      <div style="display:flex;gap:16px">
+        <div><span style="font-size:16px;font-weight:700;color:#F1F5F9">200</span><span style="font-size:10px;color:#64748B;margin-left:4px">contacts</span></div>
+        <div><span style="font-size:16px;font-weight:700;color:${C.green}">150</span><span style="font-size:10px;color:#64748B;margin-left:4px">WebRTC (free)</span></div>
+        <div><span style="font-size:16px;font-weight:700;color:${C.amber}">50</span><span style="font-size:10px;color:#64748B;margin-left:4px">PSTN (~Rs 500)</span></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary" onclick="navigate('live')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M5 3l14 9-14 9V3z"/></svg> Start now</button>
+      <button class="btn btn-ghost">Schedule for later</button>
+    </div>
+  </div></div>`;
+}
+
+let selectedGroups=["South Zone"];
+function setMeetingType(t){
+  document.getElementById("mt-broadcast").style.border=`1px solid ${t==="broadcast"?C.accent:"#1E293B"}`;
+  document.getElementById("mt-broadcast").style.background=t==="broadcast"?C.accent+"12":"transparent";
+  document.getElementById("mt-broadcast").querySelector("div").style.color=t==="broadcast"?C.accent:"#94A3B8";
+  document.getElementById("mt-conference").style.border=`1px solid ${t==="conference"?C.accent:"#1E293B"}`;
+  document.getElementById("mt-conference").style.background=t==="conference"?C.accent+"12":"transparent";
+  document.getElementById("mt-conference").querySelector("div").style.color=t==="conference"?C.accent:"#94A3B8";
+}
+
+function renderLive(){
+  const d=liveData;const m=Math.floor(d.elapsed/60),s=d.elapsed%60,tot=d.wj+d.pj;
+  if(d.ended)return `<div class="fade" style="text-align:center;padding:40px 0">
+    <div style="width:64px;height:64px;border-radius:32px;background:${C.green}20;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="${C.green}" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></div>
+    <h2 style="font-size:22px;font-weight:700;margin-bottom:6px">Meeting ended</h2>
+    <p style="font-size:13px;color:#94A3B8;margin-bottom:20px">${tot} joined · ${m}m ${s}s</p>
+    <div class="stat-grid stat-grid-3" style="max-width:420px;margin:0 auto 20px">${stat("WebRTC (free)",d.wj,"",C.green)}${stat("PSTN (paid)",d.pj,"",C.amber)}${stat("Cost","Rs "+Math.round(d.pj*(d.elapsed/60+1)*.5),"",C.red)}</div>
+    <button class="btn btn-primary" onclick="navigate('analytics')">View analytics</button></div>`;
+  return `<div class="fade">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <div><h2 style="font-size:18px;font-weight:700;margin:0">CardioShield 500mg launch</h2>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:4px"><div style="width:8px;height:8px;border-radius:4px;background:${C.red};animation:pulse 1.5s infinite"></div><span style="font-size:12px;color:${C.red};font-weight:600">LIVE</span><span id="timer" style="font-size:12px;color:#64748B;font-family:monospace">${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}</span></div></div>
+    <button class="btn btn-danger" onclick="endMeeting()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> End meeting</button>
+  </div>
+  <div class="stat-grid stat-grid-4">
+    ${stat("Connected",'<span id="s-tot">'+tot+'</span>',"of 200 invited")}
+    ${stat("WebRTC",'<span id="s-wj">'+d.wj+'</span>',"Free",C.green)}
+    ${stat("PSTN",'<span id="s-pj">'+d.pj+'</span>',"Paid",C.amber)}
+    ${stat("Ringing",'<span id="s-ring">'+d.ring+'</span>',"",C.accent2)}
+  </div>
+  <div class="card" style="text-align:center;padding:20px">
+    <div style="font-size:13px;color:#94A3B8;margin-bottom:12px">Your microphone</div>
+    <button id="mic-btn" class="mic-btn" style="background:linear-gradient(135deg,${C.accent},${C.accent2})" onclick="toggleMic()">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>
+    </button>
+    <div id="mic-status" style="font-size:12px;color:${C.green};margin-top:10px;font-weight:600">Live — broadcasting</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Live participants</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+      ${contacts.slice(0,6).map(c=>`<div class="participant"><div class="participant-icon" style="background:${c.ch==="webrtc"?C.green:C.amber}20"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="${c.ch==="webrtc"?C.green:C.amber}" stroke-width="2">${c.ch==="webrtc"?'<path d="M5 12.55a11 11 0 0114.08 0M1.42 9a16 16 0 0121.16 0M8.53 16.11a6 6 0 016.95 0M12 20h.01"/>':'<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3"/>'}</svg></div><div><div style="font-size:11px;font-weight:500">${c.name}</div><div style="font-size:9px;color:#64748B">${c.ch==="webrtc"?"Browser":"Phone"}</div></div></div>`).join("")}
+    </div>
+    <div style="font-size:11px;color:#64748B;text-align:center;margin-top:8px">+ ${tot-6} more</div>
+  </div></div>`;
+}
+
+function startLiveTimer(){
+  liveTimer=setInterval(()=>{
+    if(liveData.ended)return;
+    liveData.elapsed++;
+    liveData.wj=Math.min(liveData.wj+Math.floor(Math.random()*8),150);
+    liveData.pj=Math.min(liveData.pj+Math.floor(Math.random()*3),50);
+    liveData.ring=Math.max(liveData.ring-Math.floor(Math.random()*10),0);
+    const m=Math.floor(liveData.elapsed/60),s=liveData.elapsed%60;
+    const el=id=>document.getElementById(id);
+    if(el("timer"))el("timer").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+    if(el("s-tot"))el("s-tot").textContent=liveData.wj+liveData.pj;
+    if(el("s-wj"))el("s-wj").textContent=liveData.wj;
+    if(el("s-pj"))el("s-pj").textContent=liveData.pj;
+    if(el("s-ring"))el("s-ring").textContent=liveData.ring;
+  },2000);
+}
+function toggleMic(){
+  liveData.muted=!liveData.muted;
+  const btn=document.getElementById("mic-btn");
+  const st=document.getElementById("mic-status");
+  btn.style.background=liveData.muted?C.red:`linear-gradient(135deg,${C.accent},${C.accent2})`;
+  st.textContent=liveData.muted?"Muted — tap to unmute":"Live — broadcasting";
+  st.style.color=liveData.muted?C.red:C.green;
+}
+function endMeeting(){liveData.ended=true;clearInterval(liveTimer);document.getElementById("main-content").innerHTML=renderLive()}
+
+function renderAnalytics(){
+  return `<div class="fade">
+  <h2 style="font-size:20px;font-weight:700;margin-bottom:4px">Meeting analytics</h2>
+  <p style="font-size:12px;color:#64748B;margin-bottom:16px">CardioShield launch — Apr 13, 2026</p>
+  <div class="stat-grid stat-grid-4">
+    ${stat("Joined","187","of 200 (93%)")}
+    ${stat("Duration","18 min","",C.accent2)}
+    ${stat("Your cost","Rs 1,250","PSTN only",C.amber)}
+    ${stat("SpearUC cost","Rs 4,000","Saved Rs 2,750",C.red)}
+  </div>
+  <div class="stat-grid stat-grid-2">
+    <div class="card">
+      <div class="card-title">Channel breakdown</div>
+      <div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:#94A3B8;margin-bottom:4px"><span>WebRTC (smartphone)</span><span style="color:${C.green};font-weight:600">150 joined — Rs 0</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:75%;background:${C.green}"></div></div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:#94A3B8;margin-bottom:4px"><span>PSTN (basic phone)</span><span style="color:${C.amber};font-weight:600">37 joined — Rs 1,250</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:25%;background:${C.amber}"></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Cost savings</div>
+      <div style="background:${C.green}10;border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:28px;font-weight:700;color:${C.green}">69%</div>
+        <div style="font-size:11px;color:#94A3B8;margin-top:4px">cheaper than SpearUC</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:12px;font-size:11px">
+        <div><span style="color:#64748B">SpearUC: </span><span style="color:${C.red};font-weight:600">Rs 4,000</span></div>
+        <div><span style="color:#64748B">Your cost: </span><span style="color:${C.green};font-weight:600">Rs 1,250</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="overflow:hidden;padding:0 0 8px">
+    <div style="padding:16px 16px 8px;font-size:13px;font-weight:600">Participant details</div>
+    <table class="table"><thead><tr><th>Name</th><th>Phone</th><th>Channel</th><th>Status</th><th>Cost</th></tr></thead>
+    <tbody>${contacts.map((c,i)=>`<tr><td style="font-weight:500;color:#F1F5F9">${c.name}</td><td style="font-family:monospace;color:#94A3B8">${c.phone}</td><td>${badge(c.ch==="webrtc"?"WebRTC":"PSTN",c.ch==="webrtc"?C.green:C.amber)}</td><td>${badge(i<8?"Joined":"Missed",i<8?C.green:C.red)}</td><td style="font-weight:600;color:${c.ch==="webrtc"?C.green:C.amber}">${i<8?(c.ch==="webrtc"?"Rs 0":"Rs 9"):"—"}</td></tr>`).join("")}</tbody></table>
+  </div></div>`;
+}
+
+function renderJoin(){
+  return `<div style="display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 48px)">
+  <div class="fade" style="max-width:360px;text-align:center">
+    <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,${C.accent},${C.accent2});display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+    <h2 style="font-size:18px;font-weight:700;margin-bottom:4px">CascadeHQ Meeting</h2>
+    <p style="font-size:13px;color:#94A3B8;margin-bottom:20px">CardioShield 500mg launch</p>
+    <div id="join-state" class="card" style="padding:24px">
+      <p style="font-size:12px;color:#64748B;margin-bottom:16px">145 people in the meeting</p>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px 20px;font-size:15px" onclick="joinMeeting()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>
+        Tap to join meeting
+      </button>
+      <p style="font-size:10px;color:#64748B;margin-top:12px">No app needed — joins via browser</p>
+    </div>
+    <p style="font-size:10px;color:#64748B;margin-top:12px">This is what smartphone users see when they tap the meeting link</p>
+  </div></div>`;
+}
+
+function joinMeeting(){
+  document.getElementById("join-state").innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px">
+      <div style="width:10px;height:10px;border-radius:5px;background:${C.green};animation:pulse 1.5s infinite"></div>
+      <span style="font-size:14px;font-weight:600;color:${C.green}">Connected</span>
+    </div>
+    <p style="font-size:12px;color:#94A3B8;margin-bottom:16px">Listening to the host...</p>
+    <div class="audio-bars">
+      <div class="audio-bar" style="background:${C.accent};animation:barAnim1 .8s ease infinite alternate;height:16px"></div>
+      <div class="audio-bar" style="background:${C.accent2};animation:barAnim2 .6s ease infinite alternate;height:16px"></div>
+      <div class="audio-bar" style="background:${C.accent};animation:barAnim3 .9s ease infinite alternate;height:16px"></div>
+      <div class="audio-bar" style="background:${C.accent2};animation:barAnim1 .7s ease infinite alternate;height:16px"></div>
+      <div class="audio-bar" style="background:${C.accent};animation:barAnim2 .85s ease infinite alternate;height:16px"></div>
+    </div>
+    <button class="btn btn-danger btn-sm" style="margin-top:20px" onclick="navigate('join')">Leave meeting</button>`;
+  document.getElementById("join-state").style.border=`1px solid ${C.green}40`;
+}
+</script>
+</body>
+</html>
