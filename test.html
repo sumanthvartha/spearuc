@@ -3,499 +3,208 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CascadeHQ Notification Test</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', -apple-system, sans-serif; background: #05050A; color: #F1F5F9; min-height: 100vh; }
-
-.container { max-width: 440px; margin: 0 auto; padding: 24px; }
-.header { text-align: center; margin-bottom: 28px; }
-.logo { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, #3B82F6, #8B5CF6); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; }
-.logo span { font-size: 18px; font-weight: 800; color: #fff; }
-h1 { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
-.subtitle { font-size: 13px; color: #64748B; }
-
-.card { background: #0F1019; border-radius: 16px; padding: 20px; border: 1px solid #252840; margin-bottom: 16px; }
-.card-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
-
-.status-bar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 13px; font-weight: 600; }
-.status-pending { background: #FBBF2415; border: 1px solid #FBBF2425; color: #FBBF24; }
-.status-granted { background: #4ADE8015; border: 1px solid #4ADE8025; color: #4ADE80; }
-.status-denied { background: #EF444415; border: 1px solid #EF444425; color: #EF4444; }
-.status-dot { width: 8px; height: 8px; border-radius: 4px; }
-
-.btn { width: 100%; padding: 15px; border-radius: 12px; border: none; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.btn:disabled { opacity: 0.4; cursor: not-allowed; }
-.btn-primary { background: linear-gradient(135deg, #3B82F6, #8B5CF6); color: #fff; box-shadow: 0 0 30px #3B82F620; }
-.btn-green { background: linear-gradient(135deg, #16A34A, #15803D); color: #fff; box-shadow: 0 0 30px #4ADE8020; }
-.btn-ghost { background: #161825; color: #94A3B8; border: 1px solid #252840; }
-.btn-red { background: #3B1118; color: #EF4444; border: 1px solid #EF444430; }
-
-.step { display: flex; gap: 12px; margin-bottom: 16px; }
-.step-num { width: 28px; height: 28px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0; }
-.step-active { background: #3B82F620; color: #3B82F6; border: 1px solid #3B82F640; }
-.step-done { background: #4ADE8020; color: #4ADE80; border: 1px solid #4ADE8040; }
-.step-waiting { background: #161825; color: #475569; border: 1px solid #252840; }
-.step-text h3 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
-.step-text p { font-size: 12px; color: #64748B; line-height: 1.5; }
-
-.timer-section { text-align: center; padding: 20px 0; }
-.timer-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: #64748B; text-transform: uppercase; margin-bottom: 8px; }
-.timer { font-size: 48px; font-weight: 800; font-family: monospace; color: #3B82F6; }
-.timer-sub { font-size: 12px; color: #475569; margin-top: 4px; }
-
-.notif-preview { background: #1A1D2E; border-radius: 14px; overflow: hidden; border: 1px solid #2A2D45; margin: 16px 0; box-shadow: 0 8px 32px rgba(59,130,246,0.1); }
-.notif-header { padding: 10px 14px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #252840; }
-.notif-badge { width: 16px; height: 16px; border-radius: 5px; background: linear-gradient(135deg, #3B82F6, #8B5CF6); display: flex; align-items: center; justify-content: center; }
-.notif-badge span { font-size: 8px; font-weight: 800; color: #fff; }
-.notif-app { font-size: 11px; font-weight: 600; color: #94A3B8; }
-.notif-live { margin-left: auto; display: flex; align-items: center; gap: 4px; }
-.notif-live-dot { width: 6px; height: 6px; border-radius: 3px; background: #4ADE80; animation: pulse 1s infinite; }
-.notif-live-text { font-size: 10px; color: #4ADE80; font-weight: 600; }
-.notif-body { padding: 12px 14px; }
-.notif-title { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
-.notif-desc { font-size: 12px; color: #94A3B8; }
-.notif-actions { display: flex; border-top: 1px solid #252840; }
-.notif-action { flex: 1; padding: 11px; text-align: center; font-size: 13px; font-weight: 700; cursor: pointer; transition: background 0.15s; }
-.notif-action:first-child { border-right: 1px solid #252840; color: #4ADE80; }
-.notif-action:last-child { color: #64748B; }
-
-.log { background: #0A0D17; border-radius: 10px; padding: 14px; margin-top: 12px; max-height: 200px; overflow-y: auto; }
-.log-entry { font-size: 11px; font-family: monospace; padding: 4px 0; border-bottom: 1px solid #151825; display: flex; gap: 8px; }
-.log-time { color: #475569; flex-shrink: 0; }
-.log-msg { color: #94A3B8; }
-.log-ok { color: #4ADE80; }
-.log-err { color: #EF4444; }
-.log-info { color: #3B82F6; }
-
-.explain { background: #161825; border-radius: 12px; padding: 16px; border: 1px solid #252840; margin-top: 16px; }
-.explain-title { font-size: 12px; font-weight: 700; color: #94A3B8; margin-bottom: 8px; }
-.explain-text { font-size: 12px; color: #64748B; line-height: 1.6; }
-.explain-text code { font-size: 11px; background: #0F1019; padding: 1px 5px; border-radius: 3px; color: #22D3EE; }
-
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, sans-serif;
+    background: #09090B; color: #F1F5F9;
+    padding: 40px 20px; text-align: center;
+    min-height: 100vh;
+  }
+  h2 { font-size: 22px; margin-bottom: 8px; }
+  .sub { font-size: 13px; color: #64748B; margin-bottom: 24px; }
+  #status {
+    padding: 12px 16px; border-radius: 10px;
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 20px;
+  }
+  .pending { background: #FBBF2415; color: #FBBF24; border: 1px solid #FBBF2425; }
+  .granted { background: #4ADE8015; color: #4ADE80; border: 1px solid #4ADE8025; }
+  .error { background: #EF444415; color: #EF4444; border: 1px solid #EF444425; }
+  .btn {
+    display: block; width: 100%; padding: 16px;
+    border: none; border-radius: 12px;
+    font-size: 16px; font-weight: 700;
+    cursor: pointer; margin-bottom: 12px;
+    font-family: inherit;
+  }
+  .btn-blue { background: #3B82F6; color: #fff; }
+  .btn-green { background: #16A34A; color: #fff; }
+  .btn-gray { background: #1E1E2E; color: #94A3B8; border: 1px solid #333; }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .log {
+    margin-top: 20px; text-align: left;
+    background: #0F0F1A; border-radius: 10px;
+    padding: 14px; font-size: 12px;
+    font-family: monospace; color: #94A3B8;
+    max-height: 300px; overflow-y: auto;
+  }
+  .log div { padding: 4px 0; border-bottom: 1px solid #1a1a2e; }
+  .ok { color: #4ADE80; }
+  .err { color: #EF4444; }
+  .info { color: #3B82F6; }
+  .steps {
+    text-align: left; background: #0F0F1A;
+    border-radius: 12px; padding: 16px;
+    margin-bottom: 20px; border: 1px solid #222;
+  }
+  .steps h3 { font-size: 14px; margin-bottom: 10px; color: #FBBF24; }
+  .steps p { font-size: 12px; color: #64748B; line-height: 1.6; margin-bottom: 6px; }
+  .steps .num {
+    display: inline-block; width: 20px; height: 20px;
+    border-radius: 10px; background: #3B82F620;
+    color: #3B82F6; font-size: 11px; font-weight: 700;
+    text-align: center; line-height: 20px; margin-right: 6px;
+  }
 </style>
 </head>
 <body>
-<div class="container">
-  <div class="header">
-    <div class="logo"><span>C</span></div>
-    <h1>Real notification test</h1>
-    <p class="subtitle">Test actual browser notifications on your device</p>
-  </div>
 
-  <!-- Status -->
-  <div id="status" class="status-bar status-pending">
-    <div class="status-dot" style="background: #FBBF24;"></div>
-    <span>Notification permission: checking...</span>
-  </div>
+<h2>🔔 CascadeHQ</h2>
+<p class="sub">Real notification test on your phone</p>
 
-  <!-- Steps -->
-  <div class="card">
-    <div class="card-title">How this test works</div>
-    <div class="step">
-      <div class="step-num step-active" id="s1">1</div>
-      <div class="step-text">
-        <h3>Grant permission</h3>
-        <p>Your browser will ask "Allow notifications?" — tap Allow</p>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num step-waiting" id="s2">2</div>
-      <div class="step-text">
-        <h3>Set countdown timer</h3>
-        <p>Choose 5, 10, or 15 seconds. Simulates admin starting a meeting</p>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num step-waiting" id="s3">3</div>
-      <div class="step-text">
-        <h3>Minimize your browser</h3>
-        <p>Go to your home screen. Wait. Watch the notification arrive.</p>
-      </div>
-    </div>
-  </div>
+<div id="status" class="pending">⏳ Checking...</div>
 
-  <!-- Permission button -->
-  <div id="perm-section">
-    <button class="btn btn-primary" id="perm-btn" onclick="requestPermission()">
-      Allow notifications
-    </button>
-  </div>
-
-  <!-- Timer section (hidden initially) -->
-  <div id="timer-section" style="display:none; animation: fadeIn 0.4s ease;">
-    <div class="card">
-      <div class="card-title">Set meeting start delay</div>
-      <div style="display: flex; gap: 8px; margin-bottom: 16px;">
-        <button class="btn btn-ghost" onclick="setDelay(5)" id="d5" style="flex:1; padding:12px;">5 sec</button>
-        <button class="btn btn-ghost" onclick="setDelay(10)" id="d10" style="flex:1; padding:12px;">10 sec</button>
-        <button class="btn btn-ghost" onclick="setDelay(15)" id="d15" style="flex:1; padding:12px;">15 sec</button>
-      </div>
-
-      <div class="timer-section" id="countdown-display" style="display:none;">
-        <div class="timer-label">Meeting starts in</div>
-        <div class="timer" id="countdown">--</div>
-        <div class="timer-sub">Minimize your browser now → go to home screen</div>
-      </div>
-
-      <button class="btn btn-green" id="start-btn" onclick="startCountdown()" disabled>
-        🔴 Start meeting (sends notification)
-      </button>
-    </div>
-
-    <!-- Notification preview -->
-    <div class="card">
-      <div class="card-title">What you'll receive</div>
-      <div class="notif-preview">
-        <div class="notif-header">
-          <div class="notif-badge"><span>C</span></div>
-          <span class="notif-app">CASCADEHQ</span>
-          <div class="notif-live">
-            <div class="notif-live-dot"></div>
-            <span class="notif-live-text">LIVE</span>
-          </div>
-        </div>
-        <div class="notif-body">
-          <div class="notif-title">🔴 Q1 Sales Kickoff — LIVE NOW</div>
-          <div class="notif-desc">Rajesh Kumar is speaking · 147 people joined · Tap to join</div>
-        </div>
-        <div class="notif-actions">
-          <div class="notif-action">Join Now</div>
-          <div class="notif-action">Dismiss</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Quick fire tests -->
-    <div class="card">
-      <div class="card-title">Quick-fire tests</div>
-      <p style="font-size:12px; color:#64748B; margin-bottom:12px;">Send different notification types to see how they look on your device</p>
-      <div style="display:flex; flex-direction:column; gap:8px;">
-        <button class="btn btn-ghost" onclick="sendNotif('live')" style="padding:12px; font-size:13px;">
-          🔴 Send "Meeting LIVE" notification
-        </button>
-        <button class="btn btn-ghost" onclick="sendNotif('reminder')" style="padding:12px; font-size:13px;">
-          ⏰ Send "Meeting in 5 min" reminder
-        </button>
-        <button class="btn btn-ghost" onclick="sendNotif('ended')" style="padding:12px; font-size:13px;">
-          ✅ Send "Meeting ended + summary" notification
-        </button>
-        <button class="btn btn-ghost" onclick="sendNotif('urgent')" style="padding:12px; font-size:13px;">
-          🚨 Send "Emergency broadcast" notification
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Event log -->
-  <div class="card" id="log-card" style="display:none;">
-    <div class="card-title">Event log</div>
-    <div class="log" id="log"></div>
-  </div>
-
-  <!-- Explanation -->
-  <div class="explain" id="explain-section" style="display:none;">
-    <div class="explain-title">What just happened (technically)</div>
-    <div class="explain-text" id="explain-text"></div>
-  </div>
+<div class="steps" id="instructions">
+  <h3>Test instructions</h3>
+  <p><span class="num">1</span> Tap "Allow Notifications" below</p>
+  <p><span class="num">2</span> Tap "Send Notification (5s delay)"</p>
+  <p><span class="num">3</span> IMMEDIATELY go to your home screen</p>
+  <p><span class="num">4</span> Wait 5 seconds — watch notification arrive</p>
 </div>
 
+<!-- Step 1: Register SW + Permission -->
+<button class="btn btn-blue" id="allow-btn" onclick="setup()">
+  Step 1: Allow Notifications
+</button>
+
+<!-- Step 2: Send notifications -->
+<button class="btn btn-green" id="send5" onclick="sendAfter(5)" disabled>
+  Step 2: Send Notification (5s delay)
+</button>
+
+<button class="btn btn-gray" id="send10" onclick="sendAfter(10)" disabled>
+  Send Notification (10s delay)
+</button>
+
+<button class="btn btn-gray" id="send0" onclick="sendAfter(0)" disabled>
+  Send Notification (instant)
+</button>
+
+<div class="log" id="log"></div>
+
 <script>
-let selectedDelay = 0;
-let countdownInterval = null;
-let remaining = 0;
+let swReg = null;
 
-function log(msg, type = 'info') {
-  const logEl = document.getElementById('log');
-  const card = document.getElementById('log-card');
-  card.style.display = 'block';
-  const now = new Date().toLocaleTimeString('en-IN', { hour12: false });
-  const cls = type === 'ok' ? 'log-ok' : type === 'err' ? 'log-err' : 'log-info';
-  logEl.innerHTML = `<div class="log-entry"><span class="log-time">${now}</span><span class="${cls}">${msg}</span></div>` + logEl.innerHTML;
+function log(msg, type) {
+  const el = document.getElementById('log');
+  const t = new Date().toLocaleTimeString();
+  el.innerHTML = `<div class="${type}">${t} — ${msg}</div>` + el.innerHTML;
 }
 
-function updateStatus(state, text) {
+function setStatus(text, cls) {
   const el = document.getElementById('status');
-  el.className = 'status-bar status-' + state;
-  const colors = { pending: '#FBBF24', granted: '#4ADE80', denied: '#EF4444' };
-  el.innerHTML = `<div class="status-dot" style="background:${colors[state]}"></div><span>${text}</span>`;
+  el.textContent = text;
+  el.className = cls;
 }
 
-// Check initial permission
-function checkPermission() {
-  if (!('Notification' in window)) {
-    updateStatus('denied', 'Notifications not supported in this browser');
-    log('Browser does not support Notification API', 'err');
-    document.getElementById('perm-btn').disabled = true;
-    document.getElementById('perm-btn').textContent = 'Not supported in this environment';
-    showExplanation('This artifact runs inside an iframe which blocks the Notification API. To test for real, you need to deploy a simple HTML page to a server (even localhost works). The code below is exactly what you need — copy it, run it, and test on your phone.');
-    showFallbackDemo();
+// STEP 1: Register Service Worker + Ask Permission
+async function setup() {
+  try {
+    // Register Service Worker
+    log('Registering Service Worker...', 'info');
+    swReg = await navigator.serviceWorker.register('/sw.js');
+    log('Service Worker registered ✓', 'ok');
+
+    // Wait for it to be active
+    await navigator.serviceWorker.ready;
+    log('Service Worker active ✓', 'ok');
+
+    // Ask notification permission
+    log('Requesting notification permission...', 'info');
+    const perm = await Notification.requestPermission();
+    log('Permission: ' + perm, perm === 'granted' ? 'ok' : 'err');
+
+    if (perm === 'granted') {
+      setStatus('✅ Ready — Service Worker active, notifications allowed', 'granted');
+      document.getElementById('allow-btn').style.display = 'none';
+      document.getElementById('send5').disabled = false;
+      document.getElementById('send10').disabled = false;
+      document.getElementById('send0').disabled = false;
+    } else {
+      setStatus('❌ Permission denied — check browser settings', 'error');
+    }
+
+  } catch (e) {
+    log('Error: ' + e.message, 'err');
+    setStatus('❌ Error: ' + e.message, 'error');
+  }
+}
+
+// STEP 2: Send notification after delay
+function sendAfter(seconds) {
+  if (!swReg) { log('No Service Worker — tap Step 1 first', 'err'); return; }
+
+  log(`Notification in ${seconds}s — GO TO HOME SCREEN NOW`, 'ok');
+  document.getElementById('send5').textContent = `⏳ ${seconds}s — GO TO HOME SCREEN`;
+
+  setTimeout(async () => {
+    try {
+      await swReg.showNotification(
+        '🔴 Q1 Sales Kickoff — LIVE NOW',
+        {
+          body: 'Rajesh Kumar is speaking · 147 people joined · Tap to join now',
+          requireInteraction: true,
+          vibrate: [400, 100, 400, 100, 400],
+          tag: 'cascade-live',
+          renotify: true,
+          actions: [
+            { action: 'join', title: '🟢 Join Now' },
+            { action: 'dismiss', title: 'Dismiss' }
+          ]
+        }
+      );
+      log('✅ Notification sent!', 'ok');
+      document.getElementById('send5').textContent = 'Step 2: Send Notification (5s delay)';
+    } catch (e) {
+      log('Send error: ' + e.message, 'err');
+    }
+  }, seconds * 1000);
+}
+
+// Check if SW is already registered
+async function init() {
+  if (!('serviceWorker' in navigator)) {
+    setStatus('❌ Service Workers not supported', 'error');
+    log('This browser does not support Service Workers', 'err');
     return;
   }
 
-  if (Notification.permission === 'granted') {
-    onPermissionGranted();
-  } else if (Notification.permission === 'denied') {
-    updateStatus('denied', 'Notifications blocked — reset in browser settings');
-    log('Permission previously denied', 'err');
+  if (!('Notification' in window)) {
+    setStatus('❌ Notifications not supported', 'error');
+    log('This browser does not support Notifications', 'err');
+    return;
+  }
+
+  // Check if already set up from previous visit
+  const reg = await navigator.serviceWorker.getRegistration();
+  if (reg && Notification.permission === 'granted') {
+    swReg = reg;
+    setStatus('✅ Ready (from previous visit)', 'granted');
+    document.getElementById('allow-btn').style.display = 'none';
+    document.getElementById('send5').disabled = false;
+    document.getElementById('send10').disabled = false;
+    document.getElementById('send0').disabled = false;
+    log('Service Worker already registered ✓', 'ok');
+    log('Permission already granted ✓', 'ok');
   } else {
-    updateStatus('pending', 'Notification permission: not yet asked');
-    log('Ready to request permission', 'info');
+    setStatus('👆 Tap "Allow Notifications" to start', 'pending');
+    log('Ready — waiting for setup', 'info');
   }
 }
 
-async function requestPermission() {
-  try {
-    log('Requesting notification permission...', 'info');
-    const result = await Notification.requestPermission();
-    log(`Permission result: ${result}`, result === 'granted' ? 'ok' : 'err');
-    
-    if (result === 'granted') {
-      onPermissionGranted();
-    } else {
-      updateStatus('denied', 'Permission denied — reset in browser settings to retry');
-      showExplanation('You denied notification permission. In production, the onboarding flow would explain why this is needed before asking. Users who deny can re-enable in browser settings → Site settings → Notifications.');
-    }
-  } catch (e) {
-    log(`Permission error: ${e.message}`, 'err');
-    updateStatus('denied', 'Could not request permission (iframe restriction)');
-    showExplanation('The Notification API is blocked inside this iframe. This is a browser security measure, not a limitation of the technology. On a real deployed website, this works perfectly. See the self-test instructions below.');
-    showFallbackDemo();
-  }
-}
-
-function onPermissionGranted() {
-  updateStatus('granted', 'Notifications allowed ✓');
-  document.getElementById('perm-section').style.display = 'none';
-  document.getElementById('timer-section').style.display = 'block';
-  document.getElementById('s1').className = 'step-num step-done';
-  document.getElementById('s1').textContent = '✓';
-  document.getElementById('s2').className = 'step-num step-active';
-  log('Permission granted — ready to send notifications', 'ok');
-}
-
-function setDelay(seconds) {
-  selectedDelay = seconds;
-  ['d5', 'd10', 'd15'].forEach(id => {
-    document.getElementById(id).style.background = id === 'd' + seconds ? '#3B82F620' : '';
-    document.getElementById(id).style.borderColor = id === 'd' + seconds ? '#3B82F6' : '#252840';
-    document.getElementById(id).style.color = id === 'd' + seconds ? '#3B82F6' : '#94A3B8';
-  });
-  document.getElementById('start-btn').disabled = false;
-  log(`Delay set to ${seconds} seconds`, 'info');
-}
-
-function startCountdown() {
-  remaining = selectedDelay;
-  document.getElementById('countdown-display').style.display = 'block';
-  document.getElementById('start-btn').disabled = true;
-  document.getElementById('start-btn').textContent = 'Counting down...';
-  document.getElementById('s2').className = 'step-num step-done';
-  document.getElementById('s2').textContent = '✓';
-  document.getElementById('s3').className = 'step-num step-active';
-  
-  log(`Countdown started: ${remaining}s — MINIMIZE YOUR BROWSER NOW`, 'ok');
-  
-  countdownInterval = setInterval(() => {
-    remaining--;
-    document.getElementById('countdown').textContent = remaining;
-    
-    if (remaining <= 0) {
-      clearInterval(countdownInterval);
-      document.getElementById('countdown').textContent = '🔴';
-      document.getElementById('start-btn').textContent = '🔴 Start meeting (sends notification)';
-      document.getElementById('start-btn').disabled = false;
-      document.getElementById('s3').className = 'step-num step-done';
-      document.getElementById('s3').textContent = '✓';
-      sendNotif('live');
-    }
-  }, 1000);
-  
-  document.getElementById('countdown').textContent = remaining;
-}
-
-function sendNotif(type) {
-  const configs = {
-    live: {
-      title: '🔴 Q1 Sales Kickoff — LIVE NOW',
-      body: 'Rajesh Kumar is speaking · 147 people joined · Tap to join now',
-      tag: 'meeting-live',
-      requireInteraction: true,
-      vibrate: [400, 100, 400, 100, 400],
-      renotify: true,
-    },
-    reminder: {
-      title: '⏰ Meeting in 5 minutes',
-      body: 'Q1 Sales Kickoff starts at 11:00 AM · 200 people invited',
-      tag: 'meeting-reminder',
-      requireInteraction: false,
-      vibrate: [200, 100, 200],
-    },
-    ended: {
-      title: '✅ Meeting ended — Q1 Sales Kickoff',
-      body: '📝 AI Summary: Q1 targets revised +12%. South zone focus on Tier-2. New incentives from May 1.',
-      tag: 'meeting-ended',
-      requireInteraction: false,
-      vibrate: [200],
-    },
-    urgent: {
-      title: '🚨 URGENT: Emergency Safety Broadcast',
-      body: 'Dr. Priya Sharma is broadcasting NOW · All field staff must join immediately',
-      tag: 'meeting-urgent',
-      requireInteraction: true,
-      vibrate: [600, 200, 600, 200, 600, 200, 600],
-      renotify: true,
-    },
-  };
-
-  const config = configs[type];
-  
-  try {
-    const notif = new Notification(config.title, {
-      body: config.body,
-      icon: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#3B82F6"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-weight="800" font-size="32" fill="white">C</text></svg>'),
-      badge: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" rx="6" fill="#3B82F6"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-weight="800" font-size="14" fill="white">C</text></svg>'),
-      tag: config.tag,
-      requireInteraction: config.requireInteraction || false,
-      renotify: config.renotify || false,
-      silent: false,
-    });
-
-    // Handle notification click
-    notif.onclick = function() {
-      log('User tapped notification → would open /join/meetingId', 'ok');
-      window.focus();
-      notif.close();
-    };
-
-    log(`✅ ${type.toUpperCase()} notification sent!`, 'ok');
-    
-    if (type === 'live') {
-      showExplanation(
-        `<strong>What happened:</strong> The browser's <code>Notification</code> API created a real OS-level notification on your device. ` +
-        `In production with a Service Worker + Push API, this same notification arrives even when the browser is completely closed. ` +
-        `<br><br><strong>Key properties used:</strong><br>` +
-        `• <code>requireInteraction: true</code> — notification stays until you act on it<br>` +
-        `• <code>tag: 'meeting-live'</code> — replaces any previous meeting notification<br>` +
-        `• <code>renotify: true</code> — re-alerts even if same tag exists<br>` +
-        `<br><strong>The difference in production:</strong> With a Service Worker, you'd also get <code>vibrate: [400,100,400,100,400]</code> (3 long pulses) ` +
-        `and <code>actions</code> buttons directly on the notification. The browser Notification API used here doesn't support those — only Push + Service Worker does.`
-      );
-    }
-    
-  } catch (e) {
-    log(`Failed to send: ${e.message}`, 'err');
-    showFallbackDemo();
-  }
-}
-
-function showExplanation(html) {
-  const el = document.getElementById('explain-section');
-  el.style.display = 'block';
-  document.getElementById('explain-text').innerHTML = html;
-}
-
-function showFallbackDemo() {
-  const section = document.getElementById('timer-section');
-  section.style.display = 'block';
-  section.innerHTML = `
-    <div class="card" style="border-color: #3B82F630;">
-      <div class="card-title" style="color: #3B82F6;">Self-test: deploy this in 2 minutes</div>
-      <p style="font-size:12px; color:#94A3B8; margin-bottom:16px; line-height:1.6;">
-        Notifications can't fire from inside Claude's iframe. To test for real on your phone, 
-        create this single HTML file, deploy it, and open the URL on your phone's Chrome browser.
-      </p>
-      
-      <div style="font-size:11px; color:#FBBF24; margin-bottom:8px; font-weight:600;">Option 1 — localhost (laptop test)</div>
-      <div style="background:#0A0D17; border-radius:8px; padding:12px; margin-bottom:16px; font-family:monospace; font-size:11px; color:#C9D1D9; line-height:1.7; overflow-x:auto; white-space:pre;">npx serve .
-# Open http://localhost:3000/test-notif.html</div>
-      
-      <div style="font-size:11px; color:#FBBF24; margin-bottom:8px; font-weight:600;">Option 2 — deploy to Vercel (phone test)</div>
-      <div style="background:#0A0D17; border-radius:8px; padding:12px; margin-bottom:16px; font-family:monospace; font-size:11px; color:#C9D1D9; line-height:1.7; overflow-x:auto; white-space:pre;"># In your cascadehq project:
-# Save the file as public/test-notif.html
-vercel --prod
-# Open https://yourapp.vercel.app/test-notif.html on phone</div>
-
-      <div style="font-size:11px; color:#FBBF24; margin-bottom:8px; font-weight:600;">The test file (save as test-notif.html)</div>
-      <div style="background:#0A0D17; border-radius:8px; padding:12px; font-family:monospace; font-size:10px; color:#C9D1D9; line-height:1.6; overflow-x:auto; white-space:pre; max-height: 300px; overflow-y:auto;">&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-  &lt;meta name="viewport" content="width=device-width"&gt;
-  &lt;title&gt;CascadeHQ Notification Test&lt;/title&gt;
-&lt;/head&gt;
-&lt;body style="font-family:sans-serif; padding:40px 20px;
-  text-align:center; background:#09090B; color:#fff;"&gt;
-
-  &lt;h2&gt;CascadeHQ Notification Test&lt;/h2&gt;
-  &lt;p id="status"&gt;Checking permission...&lt;/p&gt;
-  
-  &lt;button id="allow-btn" onclick="askPerm()" 
-    style="padding:16px 32px; font-size:16px; 
-    background:#3B82F6; color:#fff; border:none;
-    border-radius:12px; margin:20px 0;"&gt;
-    Allow Notifications
-  &lt;/button&gt;
-  
-  &lt;br&gt;
-
-  &lt;button id="send-btn" onclick="sendTest()" 
-    disabled
-    style="padding:16px 32px; font-size:16px; 
-    background:#16A34A; color:#fff; border:none;
-    border-radius:12px; margin:10px 0;"&gt;
-    Send Test Notification (10s delay)
-  &lt;/button&gt;
-
-  &lt;p id="log" style="color:#666; margin-top:20px;"&gt;&lt;/p&gt;
-
-  &lt;script&gt;
-  async function askPerm() {
-    const r = await Notification.requestPermission();
-    document.getElementById('status').textContent 
-      = 'Permission: ' + r;
-    if (r === 'granted') {
-      document.getElementById('send-btn').disabled = false;
-      document.getElementById('allow-btn').style.display 
-        = 'none';
-    }
-  }
-
-  function sendTest() {
-    document.getElementById('log').textContent 
-      = 'Notification in 10 seconds... MINIMIZE BROWSER NOW';
-    
-    setTimeout(() =&gt; {
-      const n = new Notification(
-        '🔴 Q1 Sales Kickoff — LIVE NOW', {
-        body: 'Rajesh Kumar is speaking · 147 joined',
-        requireInteraction: true,
-        tag: 'cascade-test',
-        renotify: true,
-      });
-      n.onclick = () =&gt; { window.focus(); n.close(); };
-      document.getElementById('log').textContent 
-        = '✅ Notification sent!';
-    }, 10000);
-  }
-
-  // Check on load
-  if (Notification.permission === 'granted') {
-    document.getElementById('status').textContent 
-      = 'Permission: granted ✓';
-    document.getElementById('send-btn').disabled = false;
-    document.getElementById('allow-btn').style.display 
-      = 'none';
-  }
-  &lt;/script&gt;
-&lt;/body&gt;
-&lt;/html&gt;</div>
-    </div>
-  `;
-}
-
-// Init
-checkPermission();
+init();
 </script>
 </body>
 </html>
